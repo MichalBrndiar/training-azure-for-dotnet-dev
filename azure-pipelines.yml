@@ -10,5 +10,13 @@ steps:
   inputs:
     command: 'build'
     projects: 'src/TrainingAzure.WebApp/TrainingAzure.WebApp.csproj'
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'AC Azure'
+    appType: 'webAppLinux'
+    WebAppName: 'training-azure-dotnet-dev'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    RuntimeStack: 'DOTNETCORE|3.0'
 
 
