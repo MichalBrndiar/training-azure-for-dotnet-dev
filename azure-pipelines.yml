@@ -1,0 +1,49 @@
+pool:
+  vmImage: 'ubuntu-16.04'
+  name: Azure Pipelines
+
+variables:
+    BuildConfiguration: Release
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    projects: '**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: '**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    zipAfterPublish: True
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+  condition: succeededOrFailed()
+
+- task: AzureRmWebAppDeployment@4
+  displayName: 'Azure App Service Deploy: training-azure-dotnet-dev'
+  inputs:
+    azureSubscription: 'AC Azure'
+    appType: webAppLinux
+    WebAppName: 'training-azure-dotnet-dev'
+    packageForLinux: '$(build.artifactstagingdirectory)/**/*.zip'
+    RuntimeStack: 'DOTNETCORE|LTS'
