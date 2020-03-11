@@ -1,0 +1,117 @@
+﻿@model TrainingAzure.WebApp.Models.UploadImageModel
+@inject TrainingAzure.WebApp.Services.ImageService imageService
+@{ 
+    var message = TempData["message"] as string;
+    var hasMessage = !String.IsNullOrWhiteSpace(message);
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data">
+
+            <div class="card">
+                <div class="card-header">Upload image</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="file">Select image</label>
+                        <input type="file" class="form-control-file" id="file" asp-for="File">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary" asp-action="Upload">Submit</button>
+                    <button type="submit" class="btn btn-danger" asp-action="ThrowError">Throw error</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-8">
+        @if (hasMessage)
+        {
+            <div class="alert alert-success" role="alert" id="alertBox">
+                @message
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row" style="margin-top: 2rem">
+    @await foreach (var imageInfo in imageService.GetAllAsync())
+    {
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">@imageInfo.Name</div>
+                <div class="card-body" style="padding: 5px">
+                    <div>
+                        <a href="@(imageInfo.Uri.AbsoluteUri)">
+                            <img src="@(imageInfo.Uri.AbsoluteUri)" alt="" style="width: 100%;" />
+                        </a>
+                    </div>
+                    <div>
+                        <table class="table table-condensed">
+                            <tbody>
+                                <tr>
+                                    <th>Gender:</th>
+                                    <td>@imageInfo.Gender</td>
+                                </tr>
+                                <tr>
+                                    <th>Age:</th>
+                                    <td>@imageInfo.Age</td>
+                                </tr>
+                                <tr>
+                                    <th>Anger:</th>
+                                    <td>@imageInfo.Anger</td>
+                                </tr>
+                                <tr>
+                                    <th>Fear:</th>
+                                    <td>@imageInfo.Fear</td>
+                                </tr>
+                                <tr>
+                                    <th>Contempt:</th>
+                                    <td>@imageInfo.Contempt</td>
+                                </tr>
+                                <tr>
+                                    <th>Disgust:</th>
+                                    <td>@imageInfo.Disgust</td>
+                                </tr>
+                                <tr>
+                                    <th>Happiness:</th>
+                                    <td>@imageInfo.Happiness</td>
+                                </tr>
+                                <tr>
+                                    <th>Neutral:</th>
+                                    <td>@imageInfo.Neutral</td>
+                                </tr>
+                                <tr>
+                                    <th>Sadness:</th>
+                                    <td>@imageInfo.Sadness</td>
+                                </tr>
+                                <tr>
+                                    <th>Surprise:</th>
+                                    <td>@imageInfo.Surprise</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form action="Delete" method="post">
+                        <button type="submit" class="btn btn-primary" asp-action="Delete" asp-route-imageName="@imageInfo.Name">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+
+@section Scripts {
+    @if (hasMessage)
+    {
+        <script>
+            $(function () {
+                setTimeout(function () {
+                    $("#alertBox").fadeOut(3000);
+                }, 3000);
+            })
+        </script>
+    }
+}

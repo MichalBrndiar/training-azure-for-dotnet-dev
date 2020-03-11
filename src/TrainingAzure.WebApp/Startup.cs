@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TrainingAzure.WebApp.Configuration;
+using TrainingAzure.WebApp.Services;
 
 namespace TrainingAzure.WebApp
 {
@@ -23,7 +25,11 @@ namespace TrainingAzure.WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AzureConfig>(this.Configuration.GetSection("Azure"));
             services.AddControllersWithViews();
+
+            services.AddTransient<ImageService>();
+            services.AddApplicationInsightsTelemetry();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
